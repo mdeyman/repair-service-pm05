@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+    <h2>Регистрация</h2>
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="login">Логин</label>
+        <input id="login" type="text" name="login" required minlength="3" maxlength="50">
+        <label for="password">Пароль</label>
+        <input id="password" type="password" name="password" required minlength="8">
+        <label for="full_name">ФИО</label>
+        <input id="full_name" type="text" name="full_name" required maxlength="100">
+        <label for="phone">Телефон</label>
+        <input id="phone" type="text" name="phone" required maxlength="20">
+        <label for="email">Email</label>
+        <input id="email" type="email" name="email" required maxlength="100">
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+</section>
+{% endblock %}

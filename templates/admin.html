@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+    <h2>Панель администратора</h2>
+    <p>Управление заявками пользователей (MySQL, CRUD, поиск и фильтрация).</p>
+    <p><a class="button-link" href="{{ url_for('site.request_new') }}">+ Добавить заявку</a></p>
+    <form method="get" class="filters">
+        <input type="search" name="q" value="{{ q }}" placeholder="Поиск по клиенту, технике или описанию" aria-label="Поиск">
+        <select name="status" aria-label="Фильтр по статусу">
+            <option value="">Все статусы</option>
+            {% for status in statuses %}<option value="{{ status.id }}" {% if selected_status == status.id %}selected{% endif %}>{{ status.name }}</option>{% endfor %}
+        </select>
+        <button type="submit">Найти</button>
+        <a href="{{ url_for('site.admin') }}">Сброс</a>
+    </form>
+    <div class="table-scroll">
+        <table>
+            <thead><tr><th>ID</th><th>Клиент</th><th>Техника</th><th>Описание</th><th>Связь</th><th>Статус</th><th>Действия</th></tr></thead>
+            <tbody>
+            {% for item in all_requests %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.user.full_name }}</td>
+                <td>{{ item.device_type }}</td>
+                <td>{{ item.problem_description }}</td>
+                <td>{{ item.contact_method }}</td>
+                <td>
+                    <form class="inline-form" method="post" action="{{ url_for('site.request_status', request_id=item.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <select name="status_id" aria-label="Статус заявки {{ item.id }}">
+                            {% for status in statuses %}<option value="{{ status.id }}" {% if status.id == item.status_id %}selected{% endif %}>{{ status.name }}</option>{% endfor %}
+                        </select>
+                        <button type="submit">OK</button>
+                    </form>
+                </td>
+                <td>
+                    <a href="{{ url_for('site.request_edit', request_id=item.id) }}">Изменить</a>
+                    <form class="inline-form" method="post" action="{{ url_for('site.request_delete', request_id=item.id) }}" onsubmit="return confirm('Удалить заявку №{{ item.id }}?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="danger">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}<tr><td colspan="7">Заявки не найдены.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if pagination.pages > 1 %}
+    <div class="pagination">
+        {% if pagination.has_prev %}<a href="{{ url_for('site.admin', page=pagination.prev_num, q=q, status=selected_status or '') }}">← Назад</a>{% endif %}
+        <span>Страница {{ pagination.page }} из {{ pagination.pages }}</span>
+        {% if pagination.has_next %}<a href="{{ url_for('site.admin', page=pagination.next_num, q=q, status=selected_status or '') }}">Далее →</a>{% endif %}
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

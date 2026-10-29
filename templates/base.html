@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Сервис ремонта техники</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="header">
+    <div class="container header-content">
+        <h1>Сервис ремонта техники</h1>
+        <nav>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('site.admin' if current_user.role == 'admin' else 'site.dashboard') }}">Главная</a>
+                <form class="inline-form nav-form" method="post" action="{{ url_for('site.logout') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">Выход</button>
+                </form>
+            {% else %}
+                <a href="{{ url_for('site.login') }}">Вход</a>
+                <a href="{{ url_for('site.register') }}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+<main class="container">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="message">
+            {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</main>
+<script src="{{ url_for('static', filename='js/slider.js') }}"></script>
+</body>
+</html>

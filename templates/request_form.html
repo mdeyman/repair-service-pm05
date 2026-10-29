@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+    <h2>{{ 'Редактирование заявки №' ~ item.id if item else 'Добавление заявки' }}</h2>
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="user_id">Клиент</label>
+        <select id="user_id" name="user_id" required>
+            {% for user in users %}<option value="{{ user.id }}" {% if item and item.user_id == user.id %}selected{% endif %}>{{ user.full_name }} ({{ user.login }})</option>{% endfor %}
+        </select>
+        <label for="device_type">Тип техники</label>
+        <input id="device_type" name="device_type" type="text" required maxlength="100" value="{{ item.device_type if item else '' }}">
+        <label for="problem_description">Описание проблемы</label>
+        <textarea id="problem_description" name="problem_description" required maxlength="2000">{{ item.problem_description if item else '' }}</textarea>
+        <label for="contact_method">Способ связи</label>
+        <select id="contact_method" name="contact_method">
+            {% for method in ['Телефон', 'Email'] %}<option value="{{ method }}" {% if item and item.contact_method == method %}selected{% endif %}>{{ method }}</option>{% endfor %}
+        </select>
+        <label for="status_id">Статус</label>
+        <select id="status_id" name="status_id" required>
+            {% for status in statuses %}<option value="{{ status.id }}" {% if item and item.status_id == status.id %}selected{% endif %}>{{ status.name }}</option>{% endfor %}
+        </select>
+        <button type="submit">Сохранить</button>
+        <a href="{{ url_for('site.admin') }}">Отмена</a>
+    </form>
+</section>
+{% endblock %}
