@@ -162,3 +162,9 @@ th {
 .button-link { display: inline-block; background: #1f4e79; color: white; padding: 10px 14px; border-radius: 6px; text-decoration: none; }
 .danger { background: #a62b2b; }
 .pagination { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 20px; }
+
+/* ПМ.08: компактная статистика по заявкам на панели администратора */
+.stats-grid { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
+.stat-item { flex: 1 1 150px; background: #e8eef5; border-radius: 8px; padding: 14px 16px; }
+.stat-item span { display: block; font-size: 14px; }
+.stat-item strong { display: block; margin-top: 8px; font-size: 26px; }

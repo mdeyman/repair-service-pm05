@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask import abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -144,9 +144,21 @@ def admin():
     pagination = db.paginate(query.order_by(RepairRequest.id.desc()),
                              page=page, per_page=5, error_out=False)
     statuses = db.session.scalars(select(Status).order_by(Status.id)).all()
+
+    # Статистика по всем заявкам: данные берутся из MySQL через ORM.
+    rows = db.session.execute(
+        select(Status.name, func.count(RepairRequest.id))
+        .outerjoin(RepairRequest, RepairRequest.status_id == Status.id)
+        .group_by(Status.id, Status.name)
+        .order_by(Status.id)
+    ).all()
+    request_stats = [{"name": name, "count": count} for name, count in rows]
+    total_requests = sum(item["count"] for item in request_stats)
+
     return render_template("admin.html", all_requests=pagination.items,
                            statuses=statuses, pagination=pagination,
-                           q=text, selected_status=status_filter)
+                           q=text, selected_status=status_filter,
+                           request_stats=request_stats, total_requests=total_requests)
 
 
 @site.route("/admin/requests/new", methods=["GET", "POST"])

@@ -3,6 +3,18 @@
 <section class="card">
     <h2>Панель администратора</h2>
     <p>Управление заявками пользователей (MySQL, CRUD, поиск и фильтрация).</p>
+    <div class="stats-grid" aria-label="Статистика по всем заявкам">
+        <div class="stat-item">
+            <span>Всего заявок</span>
+            <strong>{{ total_requests }}</strong>
+        </div>
+        {% for stat in request_stats %}
+        <div class="stat-item">
+            <span>{{ stat.name }}</span>
+            <strong>{{ stat.count }}</strong>
+        </div>
+        {% endfor %}
+    </div>
     <p><a class="button-link" href="{{ url_for('site.request_new') }}">+ Добавить заявку</a></p>
     <form method="get" class="filters">
         <input type="search" name="q" value="{{ q }}" placeholder="Поиск по клиенту, технике или описанию" aria-label="Поиск">
