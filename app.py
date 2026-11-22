@@ -33,6 +33,25 @@ def create_app(test_config=None):
     from routes import site
     app.register_blueprint(site)
 
+    @app.cli.command("create-admin")
+    def create_admin():
+        """Создаёт первую тестовую учётную запись администратора."""
+        import click
+        from sqlalchemy import select
+        from werkzeug.security import generate_password_hash
+
+        if db.session.scalar(select(User).where(User.login == "admin")):
+            raise click.ClickException("Пользователь с логином admin уже существует")
+        password = click.prompt("Пароль администратора", hide_input=True,
+                                confirmation_prompt=True)
+        if len(password) < 8:
+            raise click.ClickException("Пароль должен содержать не менее 8 символов")
+        db.session.add(User(login="admin", password_hash=generate_password_hash(password),
+                            full_name="Тестовый администратор", phone="-",
+                            email="admin@example.invalid", role="admin"))
+        db.session.commit()
+        click.echo("Администратор admin создан")
+
     @app.errorhandler(400)
     def bad_request(error):
         return render_template("errors/error.html", code=400, message="Некорректный запрос"), 400
